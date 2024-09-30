@@ -15,6 +15,9 @@ def load_data(data_dir="./tensorflow_datasets"):
 def preprocess(image, label):
     image = tf.cast(image, tf.float32) / 255.0
     
+    # One-hot encode the label
+    label = tf.one_hot(label, depth=10)
+    
     return image, label
 
 # Normalize and preprocess the dataset, including the train-validation split
@@ -57,7 +60,7 @@ def plot_confusion_matrix_heatmap(model, ds_test, class_names, model_name):
     # Gather true labels and predicted labels
     for images, labels in ds_test:
         predictions = model.predict(images)
-        y_true.extend(labels.numpy())  # Actual labels
+        y_true.extend(np.argmax(labels.numpy(), axis=1))  # Get original labels from one-hot
         y_pred.extend(np.argmax(predictions, axis=1))  # Predicted labels
 
     # Create confusion matrix
