@@ -66,12 +66,15 @@ def plot_training_history(history, acc_filename, loss_filename):
     plt.close()
 
 def plot_confusion_matrix(y_true, y_pred, filename):
-    """Plots and saves the confusion matrix."""
+    """Plots and saves the normalized confusion matrix."""
     cm = confusion_matrix(np.argmax(y_true, axis=1), y_pred)
     
+    # Normalize the confusion matrix by rows (i.e., by the true labels)
+    cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    
     plt.figure(figsize=(10, 8))
-    sns.heatmap(cm, annot=False, cmap='Blues', fmt='g')
-    plt.title('Confusion Matrix')
+    sns.heatmap(cm_normalized, annot=False, cmap='Blues', fmt='g')
+    plt.title('Normalized Confusion Matrix')
     plt.xlabel('Predicted Labels')
     plt.ylabel('True Labels')
 
@@ -95,3 +98,9 @@ def save_class_encodings():
             writer.writerow([class_name, i])
 
     print("Class encodings saved to 'cifar100_class_encodings.csv'.")
+
+def save_early_stopping_epoch(model_name, epoch_number):
+    """Saves the early stopping epoch to a CSV file."""
+    with open('early_stopping_epochs.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([model_name, epoch_number])
