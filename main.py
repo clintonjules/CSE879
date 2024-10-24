@@ -46,6 +46,10 @@ for idx, hyperparams in enumerate(hyperparam_sets):
                             epochs=50,
                             callbacks=get_callbacks())
 
+    # Extract training and validation accuracies
+    final_train_acc_1 = history_1.history['accuracy'][-1]  # Last epoch training accuracy
+    final_val_acc_1 = history_1.history['val_accuracy'][-1]  # Last epoch validation accuracy
+
     # Check when early stopping occurred (if it did)
     if len(history_1.epoch) < 50:
         early_stopping_epoch = len(history_1.epoch)
@@ -62,7 +66,7 @@ for idx, hyperparams in enumerate(hyperparam_sets):
     print(f"Model 1 - Test Accuracy with Hyperparameters Set {idx + 1}: {test_acc_1}")
 
     # Save the results for Model 1
-    results.append(["Model 1", idx + 1, hyperparams['learning_rate'], hyperparams['batch_size'], test_acc_1])
+    results.append(["Model 1", idx + 1, hyperparams['learning_rate'], hyperparams['batch_size'], final_train_acc_1, final_val_acc_1, test_acc_1])
 
     # Generate normalized confusion matrix for Model 1
     y_true = np.concatenate([y for x, y in test_ds.batch(hyperparams['batch_size'])], axis=0)
@@ -82,6 +86,10 @@ for idx, hyperparams in enumerate(hyperparam_sets):
     history_2 = model_2.fit(train_ds_adjusted, validation_data=val_ds_adjusted, epochs=50,
                             callbacks=get_callbacks())
 
+    # Extract training and validation accuracies
+    final_train_acc_2 = history_2.history['accuracy'][-1]  # Last epoch training accuracy
+    final_val_acc_2 = history_2.history['val_accuracy'][-1]  # Last epoch validation accuracy
+
     # Check when early stopping occurred (if it did)
     if len(history_2.epoch) < 50:
         early_stopping_epoch = len(history_2.epoch)
@@ -98,7 +106,7 @@ for idx, hyperparams in enumerate(hyperparam_sets):
     print(f"Model 2 - Test Accuracy with Hyperparameters Set {idx + 1}: {test_acc_2}")
 
     # Save the results for Model 2
-    results.append(["Model 2", idx + 1, hyperparams['learning_rate'], hyperparams['batch_size'], test_acc_2])
+    results.append(["Model 2", idx + 1, hyperparams['learning_rate'], hyperparams['batch_size'], final_train_acc_2, final_val_acc_2, test_acc_2])
 
     # Generate normalized confusion matrix for Model 2
     y_true = np.concatenate([y for x, y in test_ds.batch(hyperparams['batch_size'])], axis=0)
@@ -109,6 +117,6 @@ for idx, hyperparams in enumerate(hyperparam_sets):
 with open('model_test_accuracies.csv', 'w', newline='') as file:
     writer = csv.writer(file)
     # Write the header
-    writer.writerow(["Model", "Hyperparameter Set", "Learning Rate", "Batch Size", "Test Accuracy"])
+    writer.writerow(["Model", "Hyperparameter Set", "Learning Rate", "Batch Size", "Training Accuracy", "Validation Accuracy", "Test Accuracy"])
     # Write the rows
     writer.writerows(results)
